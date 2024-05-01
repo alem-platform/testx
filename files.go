@@ -31,13 +31,13 @@ const (
 )
 
 // CompareFiles compares whether exp files equal to files containing in path.
-func CompareFiles(exp []File, path string) (bool, error) {
+func CompareFiles(exp []File, path string) (equal bool, actual []File, err error) {
 	act, err := GetFiles(path)
 	if err != nil {
-		return false, err
+		return false, nil, err
 	}
 
-	return EqualFiles(exp, act), nil
+	return EqualFiles(exp, act), act, nil
 }
 
 // GetFiles returns a list of files in given path.
