@@ -70,10 +70,10 @@ func RandStdin(n int) []string {
 
 		res = fmt.Sprintf("%v %v", stdNum[j], stdNum[k])
 		if i%n == 1 {
-			res = fmt.Sprintf("%v %v", stdNum[j], string(rand.Intn(256)))
+			res = fmt.Sprintf("%v %v", stdNum[j], rune(rand.Intn(256)))
 		}
 		if i%n == 3 {
-			res = fmt.Sprintf("%v", string(rand.Intn(256)))
+			res = fmt.Sprintf("%v", rune(rand.Intn(256)))
 		}
 		if i%n == 4 {
 			res = fmt.Sprintf("%v 0", stdNum[j])
