@@ -21,7 +21,7 @@ func (p *Program) RunScript(ctx context.Context, args ...string) (string, error)
 	return stdout, nil
 }
 
-func (p *Program) CPTestFile(ctx context.Context, file, newPath string) error {
+func (p *Program) CPTests(ctx context.Context, file, newPath string) error {
 	if err := os.Chdir(p.path); err != nil {
 		return err
 	}

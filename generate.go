@@ -5,55 +5,34 @@ import (
 	"math/rand"
 )
 
-func RandArrayInt(n int) [][20]int {
-	result := make([][20]int, 0, n)
+func RandMatrix[T any](n int, fn func() T) [][]T {
+	result := make([][]T, 0, n)
 
 	for i := 0; i < n; i++ {
-		tmp := [20]int{}
+		tmp := []T{}
 		for j := 0; j < len(tmp); j++ {
-			tmp[j] = rand.Intn(300)
+			tmp[j] = fn()
 		}
 		result = append(result, tmp)
 	}
 	return result
 }
 
-func RandArrayRune(n int) [][20]rune {
-	result := make([][20]rune, 0, n)
+func RandSlice[T any](n int, fn func() T) []*T {
+	result := make([]*T, 0, n)
+
 	for i := 0; i < n; i++ {
-		tmp := [20]rune{}
-		randLng := rand.Intn(len(tmp))
-		for j := 0; j < len(tmp); j++ {
-			if j == randLng {
-				continue
-			}
-			tmp[j] = rune(rand.Intn(256))
-		}
-		result = append(result, tmp)
+		result = append(result, getPtr(fn()))
 	}
 	return result
 }
 
-func RandIntPtr(n int) []*int {
-	result := make([]*int, 0, n)
-
-	for i := 0; i < n; i++ {
-		result = append(result, getPtr(rand.Intn(100)))
-	}
-	return result
+func RandInt() int {
+	return rand.Intn(300)
 }
 
-func RandSliceInt(n int) [][2]int {
-	result := make([][2]int, 0, n)
-
-	for i := 0; i < n; i++ {
-		tmp := [2]int{}
-		for j := 0; j < len(tmp); j++ {
-			tmp[j] = rand.Intn(100)
-		}
-		result = append(result, tmp)
-	}
-	return result
+func RandRune() rune {
+	return rune(rand.Intn(256))
 }
 
 func getPtr[T any](v T) *T {
@@ -69,13 +48,13 @@ func RandStdin(n int) []string {
 		k := rand.Intn(9)
 
 		res = fmt.Sprintf("%v %v", stdNum[j], stdNum[k])
-		if i%n == 1 {
+		if i == rand.Intn(9) {
 			res = fmt.Sprintf("%v %v", stdNum[j], rune(rand.Intn(256)))
 		}
-		if i%n == 3 {
+		if i == rand.Intn(9) {
 			res = fmt.Sprintf("%v", rune(rand.Intn(256)))
 		}
-		if i%n == 4 {
+		if i == rand.Intn(9) {
 			res = fmt.Sprintf("%v 0", stdNum[j])
 		}
 		resArr = append(resArr, res)

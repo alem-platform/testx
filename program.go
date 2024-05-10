@@ -47,7 +47,7 @@ func (p *Program) Run(ctx context.Context, stdin string) (string, error) {
 		return "", err
 	}
 
-	return Exec(context.Background(), ExecInput{
+	return Exec(ctx, ExecInput{
 		Command: "./main",
 		Stdin:   stdin,
 	})
