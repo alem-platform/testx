@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
 	"path"
 	"time"
@@ -30,6 +29,7 @@ func (p *Program) Compile(ctx context.Context) error {
 	if _, err := Exec(ctx, ExecInput{
 		Command: "go",
 		Args:    []string{"build", "-o", "main", "."},
+		Dir:     p.path,
 	}); err != nil {
 		return err
 	}
@@ -39,10 +39,6 @@ func (p *Program) Compile(ctx context.Context) error {
 }
 
 func (p *Program) Run(ctx context.Context, stdin string) (string, error) {
-	if err := os.Chdir(p.path); err != nil {
-		return "", err
-	}
-
 	if err := p.Compile(ctx); err != nil {
 		return "", err
 	}
@@ -50,6 +46,7 @@ func (p *Program) Run(ctx context.Context, stdin string) (string, error) {
 	return Exec(ctx, ExecInput{
 		Command: "./main",
 		Stdin:   stdin,
+		Dir:     p.path,
 	})
 }
 
@@ -58,6 +55,7 @@ type ExecInput struct {
 	Args    []string
 	Timeout time.Duration
 	Stdin   string
+	Dir     string
 }
 
 func Exec(ctx context.Context, input ExecInput) (string, error) {
@@ -69,6 +67,8 @@ func Exec(ctx context.Context, input ExecInput) (string, error) {
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, input.Command, input.Args...)
+	cmd.Dir = input.Dir
+
 	cmd.Cancel = func() error {
 		err := cmd.Process.Kill()
 		return err
