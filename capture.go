@@ -1,6 +1,8 @@
 package testx
 
-import "os"
+import (
+	"os"
+)
 
 func CaptureStdout(fn func()) (string, error) {
 	old := os.Stdout
@@ -25,4 +27,16 @@ func CaptureStdout(fn func()) (string, error) {
 	}
 
 	return string(stdoutBytes), nil
+}
+
+func InputStdin[T any](stdin string, fn func() T) (T, error) {
+	var defaultVal T
+
+	fakeIn, err := os.CreateTemp(os.TempDir(), "stdin-*")
+	if err != nil {
+		return defaultVal, err
+	}
+	os.WriteFile(fakeIn.Name(), []byte(stdin), 0o644)
+	os.Stdin = fakeIn
+	return fn(), nil
 }

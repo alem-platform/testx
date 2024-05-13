@@ -70,7 +70,7 @@ func RandDirs(workDir string, dirs int) error {
 			}
 		}
 
-		subDirs := rand.Intn(2) // Max 3 subdirectories per directory
+		subDirs := rand.Intn(2) // Max 2 subdirectories per directory
 		if subDirs > 0 {
 			if err := RandDirs(dirPath, subDirs); err != nil {
 				return err
