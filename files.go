@@ -28,7 +28,7 @@ type FileType string
 const (
 	TypeFile FileType = "FILE"
 	TypeLink FileType = "LINK"
-	TypeDir
+	TypeDir  FileType = "DIR"
 )
 
 // CompareFiles compares whether exp files equal to files containing in path.
