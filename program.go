@@ -78,10 +78,8 @@ func Exec(ctx context.Context, input ExecInput) (string, error) {
 		return "", fmt.Errorf("error creating stdin pipe: %s", err)
 	}
 
-	go func() {
-		defer stdinPipe.Close()
-		_, _ = stdinPipe.Write([]byte(input.Stdin))
-	}()
+	defer stdinPipe.Close()
+	_, _ = stdinPipe.Write([]byte(input.Stdin))
 
 	stdout := bytes.NewBuffer(nil)
 	stderr := bytes.NewBuffer(nil)
