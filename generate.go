@@ -9,18 +9,18 @@ import (
 
 // RandMatrix generates a random slice of slices,
 // where n is the size of the outer and m is the size of the inner slices.
-func RandMatrix[T any](n, m int, fn func() T) [][]T {
+func NewMatrix[T any](n, m int, fn func() T) [][]T {
 	result := make([][]T, 0, n)
 
 	for i := 0; i < n; i++ {
-		result = append(result, RandSlice(m, fn))
+		result = append(result, NewSlice(m, fn))
 	}
 	return result
 }
 
 // RandSlice generates a random slice,
 // where n is the size of the slice.
-func RandSlice[T any](n int, fn func() T) []T {
+func NewSlice[T any](n int, fn func() T) []T {
 	result := make([]T, 0, n)
 
 	for i := 0; i < n; i++ {

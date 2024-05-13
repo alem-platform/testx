@@ -20,7 +20,7 @@ func (p *Workdir) Bash(ctx context.Context, scriptPath ...string) (string, error
 	stdout, err := Exec(ctx, ExecInput{
 		Command: "bash",
 		Args:    []string{path.Join(scriptPath...)},
-		Timeout: time.Second * 15,
+		Timeout: time.Second * 10,
 		Dir:     p.path,
 	})
 	if err != nil {
