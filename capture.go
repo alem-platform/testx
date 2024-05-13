@@ -29,14 +29,14 @@ func CaptureStdout(fn func()) (string, error) {
 	return string(stdoutBytes), nil
 }
 
-func InputStdin[T any](stdin string, fn func() T) (T, error) {
-	var defaultVal T
-
+func InputStdin(stdin string, fn func()) error {
 	fakeIn, err := os.CreateTemp(os.TempDir(), "stdin-*")
 	if err != nil {
-		return defaultVal, err
+		return err
 	}
 	os.WriteFile(fakeIn.Name(), []byte(stdin), 0o644)
 	os.Stdin = fakeIn
-	return fn(), nil
+	fn()
+
+	return nil
 }

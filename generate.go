@@ -7,7 +7,7 @@ import (
 	"path"
 )
 
-// RandMatrix generates a random slice of slices,
+// NewMatrix generates a random slice of slices,
 // where n is the size of the outer and m is the size of the inner slices.
 func NewMatrix[T any](n, m int, fn func() T) [][]T {
 	result := make([][]T, 0, n)
@@ -18,7 +18,7 @@ func NewMatrix[T any](n, m int, fn func() T) [][]T {
 	return result
 }
 
-// RandSlice generates a random slice,
+// NewSlice generates a random slice,
 // where n is the size of the slice.
 func NewSlice[T any](n int, fn func() T) []T {
 	result := make([]T, 0, n)
