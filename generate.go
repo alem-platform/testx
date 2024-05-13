@@ -3,6 +3,8 @@ package testx
 import (
 	"fmt"
 	"math/rand"
+	"os"
+	"path"
 )
 
 // RandMatrix generates a random slice of slices,
@@ -49,4 +51,53 @@ func RandValidStdin() string {
 
 func RandInvalidStdin() string {
 	return fmt.Sprintf("%d %c", rand.Intn(100), rune(rand.Intn(100)))
+}
+
+func RandDirs(workDir string, dirs int) error {
+	for i := 0; i < dirs; i++ {
+		dirName := fmt.Sprintf("dir%d", i)
+		dirPath := path.Join(workDir, dirName)
+		if err := os.Mkdir(dirPath, 0o755); err != nil {
+			return err
+		}
+
+		files := rand.Intn(5) // Max 5 files per directory
+		for j := 0; j < files; j++ {
+			fileName := fmt.Sprintf("file%d.txt", j)
+			filePath := path.Join(dirPath, fileName)
+			if _, err := os.Create(filePath); err != nil {
+				return err
+			}
+		}
+
+		subDirs := rand.Intn(2) // Max 3 subdirectories per directory
+		if subDirs > 0 {
+			if err := RandDirs(dirPath, subDirs); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func CleanDirs(workDir string) error {
+	files, err := os.ReadDir(workDir)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		filePath := path.Join(workDir, file.Name())
+		if file.IsDir() {
+			if err := os.RemoveAll(filePath); err != nil {
+				return err
+			}
+		} else {
+			if err := os.Remove(filePath); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
