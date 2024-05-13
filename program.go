@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
 	"path"
 	"time"
@@ -30,6 +29,7 @@ func (p *Program) Compile(ctx context.Context) error {
 	if _, err := Exec(ctx, ExecInput{
 		Command: "go",
 		Args:    []string{"build", "-o", "main", "."},
+		Dir:     p.path,
 	}); err != nil {
 		return err
 	}
@@ -38,22 +38,24 @@ func (p *Program) Compile(ctx context.Context) error {
 	return nil
 }
 
-func (p *Program) Run(ctx context.Context) (string, error) {
-	if err := os.Chdir(p.path); err != nil {
-		return "", err
-	}
-
+func (p *Program) Run(ctx context.Context, stdin string) (string, error) {
 	if err := p.Compile(ctx); err != nil {
 		return "", err
 	}
 
-	return Exec(context.Background(), ExecInput{Command: "./main"})
+	return Exec(ctx, ExecInput{
+		Command: "./main",
+		Stdin:   stdin,
+		Dir:     p.path,
+	})
 }
 
 type ExecInput struct {
 	Command string
 	Args    []string
 	Timeout time.Duration
+	Stdin   string
+	Dir     string
 }
 
 func Exec(ctx context.Context, input ExecInput) (string, error) {
@@ -65,10 +67,23 @@ func Exec(ctx context.Context, input ExecInput) (string, error) {
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, input.Command, input.Args...)
+	cmd.Dir = input.Dir
+
 	cmd.Cancel = func() error {
 		err := cmd.Process.Kill()
 		return err
 	}
+	stdinPipe, err := cmd.StdinPipe()
+	if err != nil {
+		return "", fmt.Errorf("error creating stdin pipe: %s", err)
+	}
+
+	defer stdinPipe.Close()
+	_, err = stdinPipe.Write([]byte(input.Stdin))
+	if err != nil {
+		return "", fmt.Errorf("error writing to stdin pipe: %s", err)
+	}
+
 	stdout := bytes.NewBuffer(nil)
 	stderr := bytes.NewBuffer(nil)
 
