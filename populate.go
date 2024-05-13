@@ -1,9 +1,10 @@
 package testx
 
 import (
-	"fmt"
 	"os"
 	"path"
+	"path/filepath"
+	"strings"
 )
 
 type FileEntry struct {
@@ -14,38 +15,40 @@ type FileEntry struct {
 type cleanup func() error
 
 // PopulateFS создает указанные файлы и директории.
-func PopulateFS(workdir string, entries ...FileEntry) (cleanup, error) {
-	cleanups := make([]cleanup, 0)
+func PopulateFS(workdir string, entries ...FileEntry) (_ cleanup, err error) {
+	var paths []string
+
+	defer func() {
+		if err != nil {
+			removeAll(paths, workdir)
+		}
+	}()
 
 	for _, entry := range entries {
 		fullPath := path.Join(workdir, entry.Path)
-		if err := entry.create(fullPath, cleanups); err != nil {
+		if err := entry.create(fullPath); err != nil {
 			return nil, err
 		}
-		cleanups = append(cleanups, func() error {
-			return os.RemoveAll(fullPath)
-		})
+		paths = append(paths, entry.Path)
 	}
 
 	return func() error {
-		return cleanupAll(cleanups)
+		return removeAll(paths, workdir)
 	}, nil
 }
 
-func (e *FileEntry) create(fullPath string, cleanups []cleanup) error {
-	if e.Type == TypeDir {
+func (e *FileEntry) create(fullPath string) error {
+	switch e.Type {
+	case TypeDir:
 		if err := os.MkdirAll(fullPath, 0o755); err != nil {
-			if cleanupErr := cleanupAll(cleanups); cleanupErr != nil {
-				return fmt.Errorf("error cleaning up: %v, original error: %v", cleanupErr, err)
-			}
 			return err
 		}
-	} else {
+	case TypeFile:
+		if err := os.MkdirAll(filepath.Dir(fullPath), 0o755); err != nil {
+			return err
+		}
 		file, err := os.Create(fullPath)
 		if err != nil {
-			if cleanupErr := cleanupAll(cleanups); cleanupErr != nil {
-				return fmt.Errorf("error cleaning up: %v, original error: %v", cleanupErr, err)
-			}
 			return err
 		}
 		file.Close()
@@ -53,10 +56,16 @@ func (e *FileEntry) create(fullPath string, cleanups []cleanup) error {
 	return nil
 }
 
-func cleanupAll(cleanups []cleanup) error {
-	for _, cleanupFunc := range cleanups {
-		if cleanupErr := cleanupFunc(); cleanupErr != nil {
-			return cleanupErr
+func removeAll(paths []string, workdir string) error {
+	for _, p := range paths {
+		elements := strings.Split(p, "/")
+		for _, el := range elements {
+			if el == "." {
+				continue
+			}
+			if err := os.RemoveAll(path.Join(workdir, el)); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
