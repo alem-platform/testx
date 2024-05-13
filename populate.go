@@ -58,7 +58,7 @@ func (e *FileEntry) create(fullPath string) error {
 func removeAll(paths []string, workdir string) error {
 	for _, p := range paths {
 		for p != "." {
-			if err := os.RemoveAll(path.Join(workdir, filepath.Base(p))); err != nil {
+			if err := os.RemoveAll(path.Join(workdir, p)); err != nil {
 				return err
 			}
 			p = filepath.Dir(p)
