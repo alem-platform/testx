@@ -4,7 +4,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 )
 
 type FileEntry struct {
@@ -58,14 +57,11 @@ func (e *FileEntry) create(fullPath string) error {
 
 func removeAll(paths []string, workdir string) error {
 	for _, p := range paths {
-		elements := strings.Split(p, "/")
-		for _, el := range elements {
-			if el == "." {
-				continue
-			}
-			if err := os.RemoveAll(path.Join(workdir, el)); err != nil {
+		for p != "." {
+			if err := os.RemoveAll(path.Join(workdir, filepath.Base(p))); err != nil {
 				return err
 			}
+			p = filepath.Dir(p)
 		}
 	}
 	return nil
