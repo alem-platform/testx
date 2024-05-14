@@ -11,18 +11,15 @@ type FileEntry struct {
 	Type FileType
 }
 
-type cleanup func() error
+type Cleanup func() error
 
 // PopulateFS создает указанные файлы и директории.
-func PopulateFS(workdir string, entries ...FileEntry) (_ cleanup, err error) { //nolint:revive //no need to export type
+func PopulateFS(workdir string, entries ...FileEntry) (_ Cleanup, err error) {
 	paths := make([]string, 0, len(entries))
 
 	defer func() {
 		if err != nil {
-			err = removeAll(paths, workdir)
-		}
-		if err != nil {
-			panic("PopulateFS: error cleaning up dirs and files")
+			removeAll(paths, workdir) //nolint:errcheck //no need to check error
 		}
 	}()
 
