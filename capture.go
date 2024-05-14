@@ -34,7 +34,9 @@ func InputStdin(stdin string, fn func()) error {
 	if err != nil {
 		return err
 	}
-	os.WriteFile(fakeIn.Name(), []byte(stdin), 0o644)
+	if err := os.WriteFile(fakeIn.Name(), []byte(stdin), 0o600); err != nil {
+		return err
+	}
 	os.Stdin = fakeIn
 	fn()
 	if err := os.Remove(fakeIn.Name()); err != nil {

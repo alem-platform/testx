@@ -1,7 +1,6 @@
 package testx
 
 import (
-	"fmt"
 	"math/rand"
 )
 
@@ -41,12 +40,4 @@ func RandRune() rune {
 
 func getPtr[T any](v T) *T {
 	return &v
-}
-
-func RandValidStdin() string {
-	return fmt.Sprintf("%d %d", rand.Intn(100), rand.Intn(100))
-}
-
-func RandInvalidStdin() string {
-	return fmt.Sprintf("%d %c", rand.Intn(100), rune(rand.Intn(100)))
 }

@@ -5,7 +5,6 @@ import (
 	"io/fs"
 	"os"
 	"sort"
-	"strings"
 )
 
 type File struct {
@@ -119,11 +118,11 @@ func EqualFiles(files1, files2 []File) bool {
 	}
 
 	sort.SliceStable(files1, func(i, j int) bool {
-		return strings.Compare(files1[i].Path, files1[i].Path) < 0
+		return files1[i].Path < files1[j].Path
 	})
 
 	sort.SliceStable(files2, func(i, j int) bool {
-		return strings.Compare(files2[i].Path, files2[i].Path) < 0
+		return files2[i].Path < files2[j].Path
 	})
 
 	for i := 0; i < len(files1); i++ {

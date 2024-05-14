@@ -75,13 +75,13 @@ func Exec(ctx context.Context, input ExecInput) (string, error) {
 	}
 	stdinPipe, err := cmd.StdinPipe()
 	if err != nil {
-		return "", fmt.Errorf("error creating stdin pipe: %s", err)
+		return "", fmt.Errorf("error creating stdin pipe: %w", err)
 	}
 
 	defer stdinPipe.Close()
 	_, err = stdinPipe.Write([]byte(input.Stdin))
 	if err != nil {
-		return "", fmt.Errorf("error writing to stdin pipe: %s", err)
+		return "", fmt.Errorf("error writing to stdin pipe: %w", err)
 	}
 
 	stdout := bytes.NewBuffer(nil)
