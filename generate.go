@@ -18,13 +18,21 @@ func NewMatrix[T any](n, m int, fn func() T) [][]T {
 
 // NewSlice generates a random slice,
 // where n is the size of the slice.
-func NewSlice[T any](n int, fn func() T) []T {
+func NewSlice[T any](n int, fn Getter[T]) []T {
 	result := make([]T, 0, n)
 
 	for i := 0; i < n; i++ {
 		result = append(result, fn())
 	}
 	return result
+}
+
+type Getter[T any] func() T
+
+func RandRange(low, high int) Getter[int] {
+	return func() int {
+		return low + rand.Intn(high-low+1)
+	}
 }
 
 func RandInt() int {
