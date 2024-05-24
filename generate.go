@@ -35,6 +35,25 @@ func RandRange(low, high int) Getter[int] {
 	}
 }
 
+func RandString(n int, subset string) Getter[string] {
+	return func() string {
+		runes := []rune(subset)
+		result := make([]rune, 1+rand.Intn(n-1))
+		for i := range result {
+			result[i] = runes[rand.Intn(len(runes))]
+		}
+
+		return string(result)
+	}
+}
+
+func RandRangeRune(subset string) Getter[rune] {
+	return func() rune {
+		runes := []rune(subset)
+		return runes[rand.Intn(len(runes))]
+	}
+}
+
 func RandInt() int {
 	return rand.Intn(300)
 }
