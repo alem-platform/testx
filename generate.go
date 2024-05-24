@@ -51,10 +51,6 @@ func getPtr[T any](v T) *T {
 	return &v
 }
 
-func RandIntStr() string {
-	return fmt.Sprintf("%d", rand.Intn(100))
-}
-
 func RandRuneStr() string {
 	return fmt.Sprintf("%c", rune(rand.Intn(256)))
 }
