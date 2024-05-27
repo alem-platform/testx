@@ -28,7 +28,7 @@ func (p *Program) Compile(ctx context.Context) error {
 
 	if _, err := Exec(ctx, ExecInput{
 		Command: "go",
-		Args:    []string{"build", "-o", "main", "."},
+		Args:    []string{"build", "-o", "main", "main.go"},
 		Dir:     p.path,
 	}); err != nil {
 		return err
