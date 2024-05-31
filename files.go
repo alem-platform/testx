@@ -30,14 +30,19 @@ const (
 	TypeDir  FileType = "DIR"
 )
 
+type Flag struct {
+	IgnorePermission bool
+	IgnoreContent    bool
+}
+
 // CompareFiles compares whether exp files equal to files containing in path.
-func CompareFiles(exp []File, path string) (equal bool, actual []File, err error) {
+func CompareFiles(exp []File, path string, flag Flag) (equal bool, actual []File, err error) {
 	act, err := GetFiles(path)
 	if err != nil {
 		return false, nil, err
 	}
 
-	return EqualFiles(exp, act), act, nil
+	return EqualFiles(exp, act, flag), act, nil
 }
 
 // GetFiles returns a list of files in given path.
@@ -112,7 +117,7 @@ func GetFiles(path string) ([]File, error) {
 	return files, nil
 }
 
-func EqualFiles(files1, files2 []File) bool {
+func EqualFiles(files1, files2 []File, flag Flag) bool {
 	if len(files1) != len(files2) {
 		return false
 	}
@@ -126,7 +131,7 @@ func EqualFiles(files1, files2 []File) bool {
 	})
 
 	for i := 0; i < len(files1); i++ {
-		if !EqualFile(files1[i], files2[i]) {
+		if !EqualFile(files1[i], files2[i], flag) {
 			return false
 		}
 	}
@@ -134,10 +139,18 @@ func EqualFiles(files1, files2 []File) bool {
 	return true
 }
 
-func EqualFile(a, b File) bool {
-	return (a.Path == b.Path) &&
-		(a.Type == b.Type) &&
-		(a.Permission == b.Permission) &&
-		(a.Link == b.Link) &&
-		bytes.Equal(a.Content, b.Content)
+func EqualFile(a, b File, flag Flag) bool {
+	if a.Path != b.Path || a.Type != b.Type || a.Link != b.Link {
+		return false
+	}
+
+	if !flag.IgnorePermission && a.Permission != b.Permission {
+		return false
+	}
+
+	if !flag.IgnoreContent && !bytes.Equal(a.Content, b.Content) {
+		return false
+	}
+
+	return true
 }
