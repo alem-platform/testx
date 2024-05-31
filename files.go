@@ -20,6 +20,10 @@ type File struct {
 	Link string
 
 	Content []byte
+
+	IgnorePermission bool
+
+	IgnoreContent bool
 }
 
 type FileType string
@@ -135,9 +139,17 @@ func EqualFiles(files1, files2 []File) bool {
 }
 
 func EqualFile(a, b File) bool {
-	return (a.Path == b.Path) &&
-		(a.Type == b.Type) &&
-		(a.Permission == b.Permission) &&
-		(a.Link == b.Link) &&
-		bytes.Equal(a.Content, b.Content)
+	if a.Path != b.Path || a.Type != b.Type || a.Link != b.Link {
+		return false
+	}
+
+	if !a.IgnorePermission && a.Permission != b.Permission {
+		return false
+	}
+
+	if !a.IgnoreContent && !bytes.Equal(a.Content, b.Content) {
+		return false
+	}
+
+	return true
 }
