@@ -16,10 +16,10 @@ func NewWorkdir(dirs ...string) Workdir {
 	}
 }
 
-func (p *Workdir) Bash(ctx context.Context, scriptPath ...string) (string, error) {
+func (p *Workdir) Bash(ctx context.Context, args ...string) (string, error) {
 	stdout, err := Exec(ctx, ExecInput{
 		Command: "bash",
-		Args:    []string{path.Join(scriptPath...)},
+		Args:    args,
 		Timeout: time.Second * 10,
 		Dir:     p.path,
 	})
