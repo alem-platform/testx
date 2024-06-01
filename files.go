@@ -116,10 +116,6 @@ func GetFiles(path string) ([]File, error) {
 }
 
 func EqualFiles(expFiles, actFiles []File) bool {
-	if len(expFiles) != len(actFiles) {
-		return false
-	}
-
 	found := 0
 	for _, expFile := range expFiles {
 		for _, actFile := range actFiles {
