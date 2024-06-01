@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io/fs"
 	"os"
-	"sort"
 )
 
 type File struct {
@@ -116,26 +115,22 @@ func GetFiles(path string) ([]File, error) {
 	return files, nil
 }
 
-func EqualFiles(files1, files2 []File) bool {
-	if len(files1) != len(files2) {
+func EqualFiles(expFiles, actFiles []File) bool {
+	if len(expFiles) != len(actFiles) {
 		return false
 	}
 
-	sort.SliceStable(files1, func(i, j int) bool {
-		return files1[i].Path < files1[j].Path
-	})
-
-	sort.SliceStable(files2, func(i, j int) bool {
-		return files2[i].Path < files2[j].Path
-	})
-
-	for i := 0; i < len(files1); i++ {
-		if !EqualFile(files1[i], files2[i]) {
-			return false
+	found := 0
+	for _, expFile := range expFiles {
+		for _, actFile := range actFiles {
+			if EqualFile(expFile, actFile) {
+				found++
+				break
+			}
 		}
 	}
 
-	return true
+	return found == len(expFiles)
 }
 
 func EqualFile(a, b File) bool {
